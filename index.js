@@ -47,6 +47,62 @@ async function run() {
     })
 
 
+
+
+  // get all data by speceific email
+  app.get('/my-donation/:email', async (req, res) => {
+    const email = req.params.email;
+    const query = { 
+      requesterEmail: email };
+
+    console.log('Received email:', email);  // Log received email
+
+    try {
+        const result = await bloodRequestCollection.find(query).toArray();
+        console.log('Query result:', result);  // Log query result
+
+        if (result.length === 0) {
+            console.warn('No donations found for email:', email);
+        }
+        
+        res.send(result);
+    } catch (error) {
+        console.error('Error fetching donations:', error);
+        res.status(500).send({ error: 'An error occurred while fetching donations' });
+    }
+});
+
+// get data 3 speceice email
+
+app.get('/my-donation-limit/:email', async (req, res) => {
+  const email = req.params.email;
+  const query = { requesterEmail: email };
+
+  console.log('Received email:', email);  // Log received email
+
+  try {
+      const result = await bloodRequestCollection
+          .find(query)
+          .sort({ createdAt: -1 })  // Sort by createdAt in descending order
+          .limit(3)  // Limit to the latest 3 entries
+          .toArray();
+
+      console.log('Query result:', result);  // Log query result
+
+      if (result.length === 0) {
+          console.warn('No donations found for email:', email);
+      }
+      
+      res.send(result);
+  } catch (error) {
+      console.error('Error fetching donations:', error);
+      res.status(500).send({ error: 'An error occurred while fetching donations' });
+  }
+});
+
+
+
+
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
     // Send a ping to confirm a successful connection
