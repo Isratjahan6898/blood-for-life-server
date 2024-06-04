@@ -18,7 +18,7 @@ app.use(express.json());
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.kowhoxx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -46,6 +46,8 @@ async function run() {
       res.send(result);
     })
 
+  //get all data  
+
 
 
 
@@ -55,11 +57,11 @@ async function run() {
     const query = { 
       requesterEmail: email };
 
-    console.log('Received email:', email);  // Log received email
+    // console.log('Received email:', email);  // Log received email
 
     try {
         const result = await bloodRequestCollection.find(query).toArray();
-        console.log('Query result:', result);  // Log query result
+        // console.log('Query result:', result);  // Log query result
 
         if (result.length === 0) {
             console.warn('No donations found for email:', email);
@@ -78,7 +80,7 @@ app.get('/my-donation-limit/:email', async (req, res) => {
   const email = req.params.email;
   const query = { requesterEmail: email };
 
-  console.log('Received email:', email);  // Log received email
+  // console.log('Received email:', email);  // Log received email
 
   try {
       const result = await bloodRequestCollection
@@ -89,15 +91,27 @@ app.get('/my-donation-limit/:email', async (req, res) => {
 
       console.log('Query result:', result);  // Log query result
 
-      if (result.length === 0) {
-          console.warn('No donations found for email:', email);
-      }
+      // if (result.length === 0) {
+      //     console.warn('No donations found for email:', email);
+      // }
       
       res.send(result);
   } catch (error) {
-      console.error('Error fetching donations:', error);
+      // console.error('Error fetching donations:', error);
       res.status(500).send({ error: 'An error occurred while fetching donations' });
   }
+});
+
+//delete bloodData
+
+
+app.delete('/my-donation/:id', async (req, res) => {
+    const id = req.params.id;
+    
+    const query = {_id: new ObjectId(id)}
+     const result = await bloodRequestCollection.deleteOne(query);
+     res.send(result);
+      
 });
 
 
