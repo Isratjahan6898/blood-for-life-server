@@ -1,4 +1,4 @@
-const express= require('express');
+const express= require ('express');
 const app= express();
 require('dotenv').config()
 const cors= require('cors');
@@ -53,7 +53,29 @@ async function run() {
     const result = await bloodRequestCollection.findOne(query);
     res.send(result);
    })  
+    
+   //update
 
+   app.patch('/blood/:id', async(req,res)=>{
+    const item = req.body;
+    const id = req.params.id;
+    const filter= {_id: new ObjectId(id)}
+    const updateDoc= {
+      $set:{
+        recipientName: item.recipientName,
+      district:item.district ,
+      upazila: item.upazila,
+      hospital: item.hospital,
+      date:item.date,
+      time:item.time,
+        address:item.address, 
+        message:item.message
+
+      }
+    }
+    const result = await bloodRequestCollection.updateOne(filter, updateDoc)
+    res.send(result)
+   })
 
 
 
