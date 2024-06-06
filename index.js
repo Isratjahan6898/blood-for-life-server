@@ -37,6 +37,30 @@ async function run() {
 
     const bloodRequestCollection= client.db('bloodLife').collection('bloodRequest');
 
+    const usersCollection = client.db('bloodLife').collection('users');
+
+
+    //save a user
+
+    app.put('/user', async(req,res)=>{
+
+      const user =req.body;
+      const options = {upsert: true};
+      const query = {email: user?.email};
+      const updateDoc = {
+        $set: {
+          ...user
+        }
+      }
+
+      const result = await usersCollection.updateOne(query,updateDoc,options);
+      res.send(result);
+
+    })
+  app.get('/user', async(req,res)=>{
+    const result = await usersCollection.find().toArray();
+    res.send(result);
+  })
 
     //createDonationform data save
     
