@@ -45,7 +45,8 @@ async function run() {
       const result = await bloodRequestCollection.insertOne(bloodData);
       res.send(result);
     })
-
+  
+    //find blood request by id
    app.get('/blood/:id', async(req,res)=>{
     const id = req.params.id;
     
@@ -54,7 +55,7 @@ async function run() {
     res.send(result);
    })  
     
-   //update
+   //update blood request
 
    app.patch('/blood/:id', async(req,res)=>{
     const item = req.body;
@@ -77,6 +78,19 @@ async function run() {
     res.send(result)
    })
 
+
+   //get pending data 
+
+   app.get('/api/donate/pending', async (req, res) => {
+    try {
+      
+      const pendingRequests = await bloodRequestCollection.find({ status: 'pending' }).toArray();
+      res.json(pendingRequests);
+    } catch (error) {
+      console.error('Error fetching pending donation requests:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 
 
   // get all data by speceific email
@@ -140,6 +154,20 @@ app.delete('/my-donation/:id', async (req, res) => {
      const result = await bloodRequestCollection.deleteOne(query);
      res.send(result);
       
+});
+
+//update blood request status
+
+app.put('/donation-requests/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    await bloodRequestCollection.updateOne({ _id: new ObjectId(id) }, { $set: { status } });
+    const updatedRequest = await bloodRequestCollection.findOne({ _id: new ObjectId(id) });
+    res.json(updatedRequest);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 
 
