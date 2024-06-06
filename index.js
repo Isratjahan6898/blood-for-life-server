@@ -70,6 +70,18 @@ async function run() {
     res.send(result);
   })
 
+  //upate user role
+  app.put('/api/users/:id/role', (req, res) => {
+    const userId = new ObjectId(req.params.id);
+    const { role } = req.body;
+
+    usersCollection.updateOne({ _id: userId }, { $set: { role } }, (err, result) => {
+        if (err) return res.status(500).send(err);
+        if (result.matchedCount === 0) return res.status(404).send('User not found');
+        res.send({ success: true });
+    });
+});
+
     //createDonationform data save
     
     app.post('/blood', async(req,res)=>{
