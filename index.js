@@ -82,6 +82,26 @@ async function run() {
     });
 });
 
+
+//all blood request
+
+app.get('/blood', async(req,res)=>{
+  const result = await bloodRequestCollection.find().toArray();
+  res.send(result);
+})
+
+//update user status
+
+app.put('/api/users/:id/status', (req, res) => {
+  const userId = new ObjectId(req.params.id);
+  const { status } = req.body;
+
+  usersCollection.updateOne({ _id: userId }, { $set: { status } }, (err, result) => {
+      if (err) return res.status(500).send(err);
+      if (result.matchedCount === 0) return res.status(404).send('User not found');
+      res.send({ success: true });
+  });
+});
     //createDonationform data save
     
     app.post('/blood', async(req,res)=>{
@@ -213,6 +233,9 @@ app.put('/donation-requests/:id/status', async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+
+// update blood request by inprogreess to done or canceled
+
 
 
 
