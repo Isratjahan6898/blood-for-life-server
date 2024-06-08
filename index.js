@@ -38,6 +38,8 @@ async function run() {
     const bloodRequestCollection= client.db('bloodLife').collection('bloodRequest');
 
     const usersCollection = client.db('bloodLife').collection('users');
+    const blogsCollection = client.db('bloodLife').collection('blogs');
+
 
 
     //save a user
@@ -102,6 +104,32 @@ app.put('/api/users/:id/status', (req, res) => {
       res.send({ success: true });
   });
 });
+
+
+ //search user
+
+ app.get('/api/donors', async (req, res) => {
+  const { bloodGroup, district, upazila } = req.query;
+  const query = {};
+  if (bloodGroup) {
+    query.bloodGroup = bloodGroup;
+  }
+  if (district) {
+    query.district = district;
+  }
+  if (upazila) {
+    query.upazila = upazila;
+  }
+  try {
+    const donors = await usersCollection.find(query).toArray();
+    res.json(donors);
+  } catch (error) {
+    console.error('Error fetching donors:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+ 
     //createDonationform data save
     
     app.post('/blood', async(req,res)=>{
@@ -237,6 +265,17 @@ app.put('/donation-requests/:id/status', async (req, res) => {
 // update blood request by inprogreess to done or canceled
 
 
+
+//blogs post
+app.post('/blogs', async (req, res) => {
+  const blogs = req.body;
+
+
+ 
+    const result = await blogsCollection.insertOne(blogs);
+    res.send(result);
+
+});
 
 
 
