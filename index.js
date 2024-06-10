@@ -10,7 +10,13 @@ const port = process.env.PORT ||5000;
 //middleware
 
 const corsOptions = {
-    origin: ['http://localhost:5173', 'http://localhost:5174'],
+    origin: ['http://localhost:5173', 
+      'http://localhost:5174',
+      'https://blood-donetion.web.app',
+      'https://blood-donetion.firebaseapp.com'
+
+
+         ],
     credentials:true
     // optionSuccessStatus: 200,
   }
@@ -407,15 +413,22 @@ app.delete('/my-donation/:id', async (req, res) => {
 //update blood request status
 
 app.put('/donation-requests/:id/status', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-    await bloodRequestCollection.updateOne({ _id: new ObjectId(id) }, { $set: { status } });
-    const updatedRequest = await bloodRequestCollection.findOne({ _id: new ObjectId(id) });
-    res.json(updatedRequest);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
+  // try {
+  //   const { id } = req.params;
+  //   const { status } = req.body;
+  //   await bloodRequestCollection.updateOne({ _id: new ObjectId(id) }, { $set: { status } });
+  //   const updatedRequest = await bloodRequestCollection.findOne({ _id: new ObjectId(id) });
+  //   res.json(updatedRequest);
+  // } catch (err) {
+  //   res.status(500).send(err.message);
+  // }
+
+  const userId = new ObjectId(req.params.id);
+  const { status } = req.body;
+
+ const result= await bloodRequestCollection.updateOne({ _id: userId }, { $set: { status } }, 
+  );
+  res.send({ success: true });
 });
 
 // update blood request by inprogreess to done or canceled
@@ -474,6 +487,18 @@ app.put('/blogs/:id/status',  async (req, res) => {
   }
 });
 
+//get publish blog
+app.get('/api/blogs/publish', async (req, res) => {
+  try {
+    
+    const blogsdata = await blogsCollection.find({ status: 'published' }).toArray();
+    res.json(blogsdata);
+  } catch (error) {
+    console.error('Error fetching published blog:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 //payment intent
 app.post('/create-paymet-intent', async(req,res)=>{
@@ -508,7 +533,7 @@ app.get('/payment', async(req,res)=>{
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
